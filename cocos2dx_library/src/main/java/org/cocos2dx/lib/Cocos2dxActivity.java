@@ -256,6 +256,7 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
                 new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                                            ViewGroup.LayoutParams.MATCH_PARENT);
         mFrameLayout = new FrameLayout(this);
+        mFrameLayout.setBackgroundColor(Color.YELLOW);
         mFrameLayout.setLayoutParams(frameLayoutParams);
 
         Cocos2dxRenderer renderer = this.addSurfaceView();
@@ -456,6 +457,10 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
         // Switch to supported OpenGL (ARGB888) mode on emulator
         if (isAndroidEmulator())
             this.mGLSurfaceView.setEGLConfigChooser(8, 8, 8, 8, 16, 0);
+
+        mGLSurfaceView.setZOrderOnTop(true);
+        mGLSurfaceView.setEGLConfigChooser(8, 8, 8, 8, 16, 0);
+        mGLSurfaceView.getHolder().setFormat(PixelFormat.TRANSLUCENT);
 
         Cocos2dxRenderer renderer = new Cocos2dxRenderer();
         this.mGLSurfaceView.setCocos2dxRenderer(renderer);

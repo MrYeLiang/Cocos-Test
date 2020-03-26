@@ -53,9 +53,20 @@ window.__require = function e(t, n, r) {
         }
       },
       onLoad: function onLoad() {
+        cc.macro.ENABLETRANSPARENT_CANVAS = true;
+        this.node.on(cc.Node.EventType.TOUCH_END, this.screenTouch, this);
         this.score = 0;
         this.groundY = this.ground.y + this.ground.height / 2;
         this.spawnNewStar();
+      },
+      onDestroy: function onDestroy() {
+        this.node.off(cc.Node.EventType.TOUCH_END, this.screenTouch, this);
+        cc.log("remove node touch event");
+      },
+      screenTouch: function screenTouch(e) {
+        var half = .5 * this.node.width;
+        var player = this.player.getComponent("Player");
+        e.getLocation().x < half ? player.moveLeft() : player.moveRight();
       },
       spawnNewStar: function spawnNewStar() {
         var newStar = cc.instantiate(this.starPrefab);
@@ -96,43 +107,26 @@ window.__require = function e(t, n, r) {
         this.accLeft = false;
         this.accRight = false;
         this.xSpeed = 0;
-        cc.systemEvent.on(cc.SystemEvent.EventType.KEY_DOWN, this.onKeyDown, this);
-        cc.systemEvent.on(cc.SystemEvent.EventType.KEY_UP, this.onKeyUp, this);
       },
       setJumpAction: function setJumpAction() {
         var jumpUp = cc.moveBy(this.jumpDuration, cc.v2(0, this.jumpHeight)).easing(cc.easeCubicActionOut());
         var jumpDown = cc.moveBy(this.jumpDuration, cc.v2(0, -this.jumpHeight)).easing(cc.easeCubicActionIn());
         return cc.repeatForever(cc.sequence(jumpUp, jumpDown));
       },
-      onKeyDown: function onKeyDown(event) {
-        switch (event.keyCode) {
-         case cc.macro.KEY.a:
-          this.accLeft = true;
-          break;
-
-         case cc.macro.KEY.d:
-          this.accRight = true;
-        }
+      moveRight: function moveRight() {
+        this.accLeft = false;
+        this.accRight = true;
       },
-      onKeyUp: function onKeyUp(event) {
-        switch (event.keyCode) {
-         case cc.macro.KEY.a:
-          this.accLeft = false;
-          break;
-
-         case cc.macro.KEY.d:
-          this.accRight = false;
-        }
+      moveLeft: function moveLeft() {
+        this.accRight = false;
+        this.accLeft = true;
       },
       update: function update(dt) {
-        this.accLeft ? this.xSpeed -= this.accel * dt : this.accRight && (this.xSpeed += this.accel * dt);
+        this.accLeft ? this.xSpeed -= this.accel : this.accRight && (this.xSpeed += this.accel);
         Math.abs(this.xSpeed) > this.maxMoveSpeed && (this.xSpeed = this.maxMoveSpeed * this.xSpeed / Math.abs(this.xSpeed));
         this.node.x += this.xSpeed * dt;
       },
-      onDestroy: function onDestroy() {
-        cc.systemEvent.off(cc.SystemEvent.EventType.KEY_DOWN, this.onKeyDown, this);
-        cc.systemEvent.off(cc.SystemEvent.EventType.KEY_UP, this.onKeyUp, this);
-      },
+      onDestroy: function onDestroy() {},
       start: function start() {}
     });
     cc._RF.pop();
