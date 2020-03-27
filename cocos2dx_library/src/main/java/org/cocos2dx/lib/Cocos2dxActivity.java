@@ -256,7 +256,6 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
                 new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                                            ViewGroup.LayoutParams.MATCH_PARENT);
         mFrameLayout = new FrameLayout(this);
-        mFrameLayout.setBackgroundColor(Color.YELLOW);
         mFrameLayout.setLayoutParams(frameLayoutParams);
 
         Cocos2dxRenderer renderer = this.addSurfaceView();

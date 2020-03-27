@@ -117,6 +117,7 @@ window.boot = function () {
                                 div.style.backgroundImage = '';
                             }
                         }
+                        cc.Camera.main.backgroundColor = new cc.Color(0, 0, 0, 0);
                         cc.loader.onProgress = null;
                         console.log('Success to load scene: ' + launchScene);
                     }
