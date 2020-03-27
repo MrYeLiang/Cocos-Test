@@ -25,17 +25,16 @@ THE SOFTWARE.
  ****************************************************************************/
 package org.cocos2dx.lib;
 
-import android.content.ClipData;
-import android.content.ClipboardManager;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
 import android.media.AudioManager;
 import android.net.ConnectivityManager;
@@ -44,7 +43,6 @@ import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Environment;
-import android.os.ParcelFileDescriptor;
 import android.os.Vibrator;
 import android.preference.PreferenceManager.OnActivityResultListener;
 import android.util.DisplayMetrics;
@@ -53,13 +51,8 @@ import android.view.Display;
 import android.view.Surface;
 import android.view.WindowManager;
 
-import com.android.vending.expansion.zipfile.APKExpansionSupport;
-import com.android.vending.expansion.zipfile.ZipResourceFile;
-
 import java.io.File;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.LinkedHashSet;
 import java.util.Locale;
@@ -93,9 +86,6 @@ public class Cocos2dxHelper {
     // The absolute path to the OBB if it exists, else the absolute path to the APK.
     private static String sAssetsPath = "";
     
-    // The OBB file
-    private static ZipResourceFile sOBBFile = null;
-
     /**
      * Battery receiver to getting battery level.
      */
@@ -217,18 +207,6 @@ public class Cocos2dxHelper {
             Cocos2dxHelper.sVibrateService = (Vibrator)activity.getSystemService(Context.VIBRATOR_SERVICE);
 
             sInited = true;
-            
-            int versionCode = 1;
-            try {
-                versionCode = Cocos2dxActivity.getContext().getPackageManager().getPackageInfo(Cocos2dxHelper.getPackageName(), 0).versionCode;
-            } catch (NameNotFoundException e) {
-                e.printStackTrace();
-            }
-            try {
-                Cocos2dxHelper.sOBBFile = APKExpansionSupport.getAPKExpansionZipFile(Cocos2dxActivity.getContext(), versionCode, 0);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
     }
     
@@ -252,11 +230,6 @@ public class Cocos2dxHelper {
         }
         
         return Cocos2dxHelper.sAssetsPath;
-    }
-    
-    public static ZipResourceFile getObbFile()
-    {
-        return Cocos2dxHelper.sOBBFile;
     }
     
     public static Activity getActivity() {
@@ -397,28 +370,6 @@ public class Cocos2dxHelper {
         });
     }
     
-    public static long[] getObbAssetFileDescriptor(final String path) {
-        long[] array = new long[3];
-        if (Cocos2dxHelper.sOBBFile != null) {
-            AssetFileDescriptor descriptor = Cocos2dxHelper.sOBBFile.getAssetFileDescriptor(path);
-            if (descriptor != null) {
-                try {
-                    ParcelFileDescriptor parcel = descriptor.getParcelFileDescriptor();
-                    Method method = parcel.getClass().getMethod("getFd", new Class[] {});
-                    array[0] = (Integer)method.invoke(parcel);
-                    array[1] = descriptor.getStartOffset();
-                    array[2] = descriptor.getLength();
-                } catch (NoSuchMethodException e) {
-                    Log.e(Cocos2dxHelper.TAG, "Accessing file descriptor directly from the OBB is only supported from Android 3.1 (API level 12) and above.");
-                } catch (IllegalAccessException e) {
-                    Log.e(Cocos2dxHelper.TAG, e.toString());
-                } catch (InvocationTargetException e) {
-                    Log.e(Cocos2dxHelper.TAG, e.toString());
-                }
-            }
-        }
-        return array;
-    }
 
     public static void endApplication() {
         if (sActivity != null)
